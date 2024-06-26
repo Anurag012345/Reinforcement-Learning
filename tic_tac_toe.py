@@ -101,7 +101,7 @@ class State:
             while not self.isEnd:
                 # Player 1
                 positions = self.availablePositions()
-                p1_action = self.p1.chooseAction(positions, self.board, self.playerSymbol)
+                p1_action = self.p1.decideAction(positions, self.board, self.playerSymbol)
                 self.updateState(p1_action)
                 board_hash = self.getHash()
                 self.p1.addState(board_hash)
@@ -115,7 +115,7 @@ class State:
                 else:
                     # Player 2
                     positions = self.availablePositions()
-                    p2_action = self.p2.chooseAction(positions, self.board, self.playerSymbol)
+                    p2_action = self.p2.decideAction(positions, self.board, self.playerSymbol)
                     self.updateState(p2_action)
                     board_hash = self.getHash()
                     self.p2.addState(board_hash)
@@ -132,7 +132,7 @@ class State:
         while not self.isEnd:
             # Player 1
             positions = self.availablePositions()
-            p1_action = self.p1.chooseAction(positions, self.board, self.playerSymbol)
+            p1_action = self.p1.decideAction(positions, self.board, self.playerSymbol)
             self.updateState(p1_action)
             self.showBoard()
             win = self.winner()
@@ -146,7 +146,7 @@ class State:
             else:
                 # Player 2
                 positions = self.availablePositions()
-                p2_action = self.p2.chooseAction(positions)
+                p2_action = self.p2.decideAction(positions)
                 self.updateState(p2_action)
                 self.showBoard()
                 win = self.winner()
@@ -170,7 +170,7 @@ class State:
                     token = 'x'
                 if self.board[i, j] == 0:
                     token = '0'
-                out += token + ' | '
+                out += token + ' | ' # type: ignore
             print(out)
         print('-------------')
 
@@ -200,7 +200,7 @@ class Player:
                 next_board[p] = symbol
                 next_boardHash = str(next_board.reshape(NUMBER_OF_ROWS*NUMBER_OF_COLUMNS))
                 value = 0 if self.states_value.get(next_boardHash) is None else self.states_value.get(next_boardHash)
-                if value >= value_max:
+                if value >= value_max: # type: ignore
                     value_max = value
                     action = p
         return action
@@ -262,7 +262,26 @@ class HumanPlayer:
     # Append the state to states
     def addState(self, state):
         pass
-    
+
+if __name__ == "__main__":
+     # Training Phase
+     p1 = Player("p1")
+     p2 = Player("p2")
+
+     state = State(p1, p2)
+     print("Training...")
+
+     state.Play(10000)
+
+     p1.savePolicy()
+
+     # Play Against Human
+     p1 = Player("computer", exploration_rate=0)
+     p1.loadPolicy("policy_p1")
+
+     p2 = HumanPlayer("human")
+     state = State(p1, p2)
+     state.PlayHuman()
 
 
 
