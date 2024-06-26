@@ -1,3 +1,4 @@
+import pickle
 import numpy as np;
 
 NUMBER_OF_ROWS = 3  # Define the value of NUMBER_OF_ROWS
@@ -186,6 +187,83 @@ class Player:
         self.decay_gamma = 0.9
         self.lr = 0.2
         self.states_value = {} #state: value
+    
+    # Function to decide the action to be taken
+    def decideAction(self,position, current_board, symbol):
+        if np.random.uniform(0,1)<= self.exploration_rate:
+            idx = np.random.choice(len(position))
+            action = position[idx]
+        else:
+            value_max = -999
+            for p in position:
+                next_board = current_board.copy()
+                next_board[p] = symbol
+                next_boardHash = str(next_board.reshape(NUMBER_OF_ROWS*NUMBER_OF_COLUMNS))
+                value = 0 if self.states_value.get(next_boardHash) is None else self.states_value.get(next_boardHash)
+                if value >= value_max:
+                    value_max = value
+                    action = p
+        return action
+
+    #function to get the hash value of the board
+    def getHash(self,board):
+        return str(board.reshape(NUMBER_OF_ROWS*NUMBER_OF_COLUMNS))
+
+    # Function to reset states
+    def reset(self):
+        self.states = []
+
+    # Function to provide the reward
+    # As the game is played, the reward is updated
+    def feedReward(self,reward):
+        for st in reversed(self.states):
+            if self.states_value.get(st) is None:
+                self.states_value[st] = 0
+            self.states_value[st] += self.lr * (self.decay_gamma * reward - self.states_value[st])
+            reward = self.states_value[st]    
+
+    # Append a hash state to state
+    def addState(self, state):
+        self.states.append(state) 
+    
+    # Load policy for the Player,  as a Pickle File
+    def loadPolicy(self,file):
+        self.states_value = pickle.load(open(file, 'rb'))
+        
+    # Save the policy of the Player as a Pickle File
+    def savePolicy(self):
+        fw = open('policy_' + str(self.name), 'wb')
+        pickle.dump(self.states_value, fw)
+        fw.close()
+
+
+class HumanPlayer:
+
+    def __init__(self, name):
+        self.name = name
+
+    # Method to choose the action
+    def decideAction(self,position):
+        while True:
+            row = int(input("Enter row value:"))
+            col = int(input("Enter column value:"))
+            action = (row, col)
+            if action in position:
+                return action
+    
+    # Method to reset the states
+    def reset(self):
+        pass
+
+    # As the game ends, update state value
+    def feedReward(self, reward):
+        pass
+
+    # Append the state to states
+    def addState(self, state):
+        pass
+    
+
 
 
 
