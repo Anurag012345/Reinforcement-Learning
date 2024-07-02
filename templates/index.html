@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            border: 1px solid #000;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="board" id="board">
+        <div class="cell" data-row="0" data-col="0"></div>
+        <div class="cell" data-row="0" data-col="1"></div>
+        <div class="cell" data-row="0" data-col="2"></div>
+        <div class="cell" data-row="1" data-col="0"></div>
+        <div class="cell" data-row="1" data-col="1"></div>
+        <div class="cell" data-row="1" data-col="2"></div>
+        <div class="cell" data-row="2" data-col="0"></div>
+        <div class="cell" data-row="2" data-col="1"></div>
+        <div class="cell" data-row="2" data-col="2"></div>
+    </div>
+    <button id="reset">Reset</button>
+    <script>
+        const board = document.getElementById('board');
+        const resetButton = document.getElementById('reset');
+
+        board.addEventListener('click', (e) => {
+            if (e.target.classList.contains('cell')) {
+                const row = e.target.getAttribute('data-row');
+                const col = e.target.getAttribute('data-col');
+                playMove(row, col);
+            }
+        });
+
+        resetButton.addEventListener('click', resetGame);
+
+        function playMove(row, col) {
+            fetch('/play', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ row: parseInt(row), col: parseInt(col) }),
+            })
+            .then(response => response.json())
+            .then(data => updateBoard(data.board, data.result));
+        }
+
+        function resetGame() {
+            fetch('/reset', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => updateBoard(data.board));
+        }
+
+        function updateBoard(board, result = null) {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const row = cell.getAttribute('data-row');
+                const col = cell.getAttribute('data-col');
+                const value = board[row][col];
+                if (value === 1) {
+                    cell.innerHTML = '<i class="fas fa-times"></i>'; // X icon
+                } else if (value === -1) {
+                    cell.innerHTML = '<i class="far fa-circle"></i>'; // O icon
+                } else {
+                    cell.innerHTML = '';
+                }
+            });
+
+            if (result !== null) {
+                if (result === 1) {
+                    alert('Human wins!');
+                } else if (result === -1) {
+                    alert('Computer wins!');
+                } else if (result === 0) {
+                    alert('It\'s a tie!');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
