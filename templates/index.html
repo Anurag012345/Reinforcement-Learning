@@ -83,13 +83,15 @@
             });
 
             if (result !== null) {
-                if (result === 1) {
-                    alert('Human wins!');
-                } else if (result === -1) {
-                    alert('Computer wins!');
-                } else if (result === 0) {
-                    alert('It\'s a tie!');
-                }
+                setTimeout(() => {
+                    if (result === 1) {
+                        alert('Human wins!');
+                    } else if (result === -1) {
+                        alert('Computer wins!');
+                    } else if (result === 0) {
+                        alert('It\'s a tie!');
+                    }
+                }, 100); // Delay to ensure the board update is rendered
             }
         }
     </script>
