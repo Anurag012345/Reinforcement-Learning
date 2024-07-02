@@ -21,7 +21,7 @@ This is a web-based Tic-Tac-Toe game where you can play against a computer. The 
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/yourusername/tic-tac-toe.git
+git clone https://github.com/Anurag012345/tic-tac-toe.git
 cd tic-tac-toe
 ```
 
