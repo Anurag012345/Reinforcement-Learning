@@ -3,7 +3,7 @@ from tic_tac_toe import State, Player, HumanPlayer
 
 app = Flask(__name__)
 
-p1 = Player("computer", exploration_rate=0)
+p1 = Player("computer", exploration_rate=0.1)
 p1.loadPolicy("policy_p1")
 p2 = HumanPlayer("human")
 state = State(p1, p2)
